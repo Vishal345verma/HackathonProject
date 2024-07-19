@@ -1,4 +1,5 @@
 document.getElementById('getLocationButton').addEventListener('click', function() {
+    document.getElementById('loading').style.visibility = 'visible';
     if (navigator.geolocation) {
         getLocation();
         setInterval(getLocation, 120000); // 120000 milliseconds = 2 minutes
@@ -12,6 +13,7 @@ function getLocation() {
 }
 
 function sendLocation(position) {
+    document.getElementById('loading').style.visibility = 'hidden';
     var lat = position.coords.latitude;
     var lon = position.coords.longitude;
     document.getElementById('output').innerHTML = `Latitude: ${lat} <br> Longitude: ${lon}`;
@@ -57,3 +59,37 @@ function showError(error) {
             break;
     }
 }
+
+function toRadians(degrees) {
+    return degrees * (Math.PI / 180);
+}
+
+function haversineDistance(coords1, coords2) {
+    const R = 6371; // Radius of the Earth in kilometers
+    const lat1 = coords1.latitude;
+    const lon1 = coords1.longitude;
+    const lat2 = coords2.latitude;
+    const lon2 = coords2.longitude;
+
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c; // Distance in kilometers
+    return distance;
+}
+
+// Example usage:
+const location1 = { latitude: 17.5200, longitude: 78.4050 }; // Berlin
+const location2 = { latitude: 17.5201, longitude: 78.4049 };  // Paris
+
+const distance = haversineDistance(location1, location2);
+console.log(`Distance: ${distance.toFixed(2)} km`);
+
+
+document.getElementById('loading').style.visibility = 'hidden';
